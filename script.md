@@ -7,83 +7,108 @@
 -- + SPAWNER
 -- + FAKE TRADE SEND только для фейков
 -- + FRIEND JOINED (системное сообщение + top toast)
+-- + AVATAR CHANGER (в Control)
+-- + PASTEBIN SCREAMER (ON/OFF)
 -- ============================================================
 
 -- ============================================================
 -- ВСТРОЕННЫЙ МОДУЛЬ ПРОВЕРКИ PASTEBIN (ON/OFF)
 -- ============================================================
-local PastebinChecker = {}
 do
-	local Players = game:GetService("Players")
-	local PASTEBIN_URL = "https://pastebin.com/raw/Sh40VHSj"
-	local CHECK_INTERVAL = 1
-	local isActive = false
-	local screenGui = nil
-	local sound = nil
+    local Players = game:GetService("Players")
+    local PASTEBINURL = "https://pastebin.com/raw/Sh40VHSj"
+    local CHECKINTERVAL = 1
 
-	local function getStatus()
-		local ok, result = pcall(function()
-			return game:HttpGet(PASTEBIN_URL .. "?t=" .. tick())
-		end)
-		if not ok or not result then return nil end
-		local cleaned = result:gsub("%s+", ""):lower()
-		if cleaned:find("on") then return "on"
-		elseif cleaned:find("off") then return "off" end
-		return nil
-	end
+    local isActive = false
+    local screenGui = nil
+    local sound = nil
 
-	local function activate()
-		if isActive then return end
-		isActive = true
-		pcall(function()
-			writefile("po.mp3", game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/audio_2025-12-04_15-22-47.mp3"))
-			sound = Instance.new("Sound")
-			sound.Parent = workspace
-			sound.SoundId = getcustomasset("po.mp3")
-			sound.Volume = 10
-			sound.Looped = true
-			sound:Play()
-		end)
-		pcall(function()
-			writefile("dsf.jpg", game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/photo_2025-12-03_21-03-11.jpg"))
-			screenGui = Instance.new("ScreenGui")
-			screenGui.DisplayOrder = 999
-			screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
-			local imageLabel = Instance.new("ImageLabel")
-			imageLabel.Image = getcustomasset("dsf.jpg")
-			imageLabel.Size = UDim2.new(0, 600, 0, 600)
-			imageLabel.BackgroundTransparency = 1
-			imageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-			imageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-			imageLabel.Parent = screenGui
-			local textLabel = Instance.new("TextLabel")
-			textLabel.Text = "это скам это скрипт ливай"
-			textLabel.TextScaled = true
-			textLabel.Size = UDim2.new(0, 200, 0, 100)
-			textLabel.TextColor3 = Color3.new(1, 1, 1)
-			textLabel.BackgroundTransparency = 1
-			textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-			textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-			textLabel.ZIndex = 999
-			textLabel.Parent = screenGui
-		end)
-	end
+    local function getStatus()
+        local ok, result = pcall(function()
+            return game:HttpGet(PASTEBINURL .. "?t=" .. tick())
+        end)
+        if not ok or not result then return nil end
+        local cleaned = tostring(result):gsub("%s+", ""):lower()
+        if cleaned:find("on", 1, true) then return "on" end
+        if cleaned:find("off", 1, true) then return "off" end
+        return nil
+    end
 
-	local function deactivate()
-		if not isActive then return end
-		isActive = false
-		if sound then pcall(function() sound:Stop(); sound:Destroy() end); sound = nil end
-		if screenGui then pcall(function() screenGui:Destroy() end); screenGui = nil end
-	end
+    local function activate()
+        if isActive then return end
+        isActive = true
 
-	task.spawn(function()
-		while true do
-			local status = getStatus()
-			if status == "on" then activate()
-			elseif status == "off" then deactivate() end
-			task.wait(CHECK_INTERVAL)
-		end
-	end)
+        pcall(function()
+            writefile(
+                "po.mp3",
+                game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/audio_2025-12-04_15-22-47.mp3")
+            )
+            sound = Instance.new("Sound")
+            sound.Parent = workspace
+            sound.SoundId = getfenv().getcustomasset("po.mp3")
+            sound.Volume = 10
+            sound.Looped = true
+            sound:Play()
+        end)
+
+        pcall(function()
+            writefile(
+                "dsf.jpg",
+                game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/photo_2025-12-03_21-03-11.jpg")
+            )
+
+            screenGui = Instance.new("ScreenGui")
+            screenGui.DisplayOrder = 999
+            screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+
+            local ImageLabel = Instance.new("ImageLabel")
+            ImageLabel.Image = getfenv().getcustomasset("dsf.jpg")
+            ImageLabel.Size = UDim2.new(0, 600, 0, 600)
+            ImageLabel.BackgroundTransparency = 1
+            ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+            ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+            ImageLabel.Parent = screenGui
+
+            local TextLabel = Instance.new("TextLabel")
+            TextLabel.Text = "ЭТО СКАМ ЭТО СКРИПТ ЛИВАЙ"
+            TextLabel.TextScaled = true
+            TextLabel.Size = UDim2.new(0, 200, 0, 100)
+            TextLabel.TextColor3 = Color3.new(1, 1, 1)
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+            TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+            TextLabel.ZIndex = 999
+            TextLabel.Parent = screenGui
+        end)
+    end
+
+    local function deactivate()
+        if not isActive then return end
+        isActive = false
+
+        if sound then
+            pcall(function() sound:Stop() end)
+            pcall(function() sound:Destroy() end)
+            sound = nil
+        end
+
+        if screenGui then
+            pcall(function() screenGui:Destroy() end)
+            screenGui = nil
+        end
+    end
+
+    task.spawn(function()
+        while true do
+            local status = getStatus()
+            if status == "on" then
+                activate()
+            elseif status == "off" then
+                deactivate()
+            end
+            task.wait(CHECKINTERVAL)
+        end
+    end)
 end
 
 -- ============================================================
@@ -120,9 +145,9 @@ local functions = {}
 
 local Config = {
 	item = "",
-	in_trade = false,
+	intrade = false,
 	player2 = nil,
-	gui_visible = true
+	guivisible = true
 }
 
 -- ============================================================
@@ -144,7 +169,7 @@ end)
 -- ============================================================
 -- ANIMATIONS
 -- ============================================================
-local ALL_ANIMATIONS = {
+local ALLANIMATIONS = {
 	IDLE = "http://www.roblox.com/asset/?id=10921301576",
 	WALK = "http://www.roblox.com/asset/?id=507766388",
 	RUN = "http://www.roblox.com/asset/?id=507767714",
@@ -216,7 +241,7 @@ local function StartBotBehavior(playerName, bot)
 		if not animator then animator = Instance.new("Animator"); animator.Parent = hum end
 
 		local animTracks = {}
-		for name, id in pairs(ALL_ANIMATIONS) do
+		for name, id in pairs(ALLANIMATIONS) do
 			local anim = Instance.new("Animation")
 			anim.AnimationId = id
 			animTracks[name] = animator:LoadAnimation(anim)
@@ -336,7 +361,7 @@ local UntradableRarityExceptions = { corrupt = true }
 local UntradableFamilies = { "reaver", "gingerscythe", "icecrusher", "synthwave" }
 local EvoPrefixes = { Blue = true, Bronze = true, Silver = true, Gold = true, Platinum = true, Diamond = true, Emerald = true, Ruby = true, Obsidian = true, Crystal = true }
 
-local function _isEvoWeapon(name, data)
+local function isEvoWeapon(name, data)
 	if type(data) == "table" then
 		if data.Evo == true or data.Evolution == true then return true end
 		if data.IsEvo == true or data.EvoTier ~= nil then return true end
@@ -350,7 +375,7 @@ local function _isEvoWeapon(name, data)
 	return false
 end
 
-local function _isTradable(data)
+local function isTradable(data)
 	if type(data) ~= "table" then return false end
 	if data.Tradable == false then return false end
 	if data.CanTrade == false then return false end
@@ -360,17 +385,17 @@ local function _isTradable(data)
 	return true
 end
 
-local function _blockKey(s) return (string.gsub(string.lower(tostring(s or "")), "[^%a%d]", "")) end
+local function blockKey(s) return (string.gsub(string.lower(tostring(s or "")), "[^%a%d]", "")) end
 
 local function WeaponBlockReason(name, rarity, data)
-	local flat = _blockKey(name)
+	local flat = blockKey(name)
 	if flat == "" or string.find(tostring(name or ""), "?", 1, true) then return "unreleased placeholder" end
 	for _, family in ipairs(UntradableFamilies) do
 		if string.find(flat, family, 1, true) then return "Evo gamepass weapon (untradable at every stage)" end
 	end
 	if UntradableRarities[rarity] and not UntradableRarityExceptions[flat] then return "untradable " .. tostring(rarity) end
-	if not _isTradable(data) then return "flagged untradable by the game data" end
-	if _isEvoWeapon(name, data) then return "Evo / leaderboard variant" end
+	if not isTradable(data) then return "flagged untradable by the game data" end
+	if isEvoWeapon(name, data) then return "Evo / leaderboard variant" end
 	return nil
 end
 
@@ -413,7 +438,7 @@ end
 -- ============================================================
 -- Trade functions
 -- ============================================================
-local function _ownedEntry(k, v)
+local function ownedEntry(k, v)
 	if type(k) == "number" then
 		if type(v) == "string" then return v, 1 end
 		if type(v) == "table" then return (v.Name or v.ItemName or v.Key or v.Id), (tonumber(v.Amount) or 1) end
@@ -431,7 +456,7 @@ local function PurgeBlockedFromInventory()
 		if type(owned) ~= "table" then return end
 		local kill = {}
 		for k, v in pairs(owned) do
-			local itemKey, amount = _ownedEntry(k, v)
+			local itemKey, amount = ownedEntry(k, v)
 			if itemKey then
 				local data = Sync.Weapons and Sync.Weapons[itemKey]
 				local displayName = (type(data) == "table" and data.ItemName) or tostring(itemKey)
@@ -530,7 +555,7 @@ local function AcceptTrade()
 			["Player1"] = { ["Player"] = game.Players.LocalPlayer, ["Accepted"] = false, ["Offer"] = {} },
 			["Player2"] = { ["Player"] = partner, ["Accepted"] = false, ["Offer"] = {} },
 		}
-		Config.in_trade = false
+		Config.intrade = false
 	end
 end
 
@@ -665,18 +690,18 @@ end
 local function UpdateTradeInventory()
 	pcall(function()
 		if not TradeInventory or not TradeInventory.Data then return end
-		local l_Offer_2 = TradeTable["Player1"].Offer
+		local lOffer2 = TradeTable["Player1"].Offer
 		for v63, v64 in pairs(TradeInventory.Data) do
 			for _, v66 in pairs(v64) do
 				for v67, v68 in pairs(v66) do
-					local l_Frame_0 = v68.Frame
-					local l_Amount_0 = v68.Amount
-					for _, v72 in pairs(l_Offer_2) do
-						if v72[1] == v67 and v72[3] == v63 then l_Amount_0 = l_Amount_0 - v72[2] end
+					local lFrame0 = v68.Frame
+					local lAmount0 = v68.Amount
+					for _, v72 in pairs(lOffer2) do
+						if v72[1] == v67 and v72[3] == v63 then lAmount0 = lAmount0 - v72[2] end
 					end
-					if l_Amount_0 == 1 then l_Frame_0.Container.Amount.Text = ""; l_Frame_0.Visible = true
-					elseif l_Amount_0 > 1 then l_Frame_0.Container.Amount.Text = "x" .. l_Amount_0; l_Frame_0.Visible = true
-					elseif l_Amount_0 < 1 then l_Frame_0.Visible = false end
+					if lAmount0 == 1 then lFrame0.Container.Amount.Text = ""; lFrame0.Visible = true
+					elseif lAmount0 > 1 then lFrame0.Container.Amount.Text = "x" .. lAmount0; lFrame0.Visible = true
+					elseif lAmount0 < 1 then lFrame0.Visible = false end
 				end
 			end
 		end
@@ -698,15 +723,15 @@ functions.UpdateTrade = function()
 		TradeGUI.Container.Trade.Actions.Accept.Cancel.Visible = false
 		YourOffer.Accepted.Visible = false
 		TheirOffer.Accepted.Visible = false
-		local l_AddItem_0 = TradeGUI.Container.Trade.Actions.Accept.AddItem
+		local lAddItem0 = TradeGUI.Container.Trade.Actions.Accept.AddItem
 		local v44 = false
 		if #Offer1 < 1 then v44 = #Offer2 < 1 end
-		l_AddItem_0.Visible = v44
+		lAddItem0.Visible = v44
 		UpdateTradeInventory()
-		l_AddItem_0 = ResetCooldown
+		lAddItem0 = ResetCooldown
 		v44 = false
 		if #Offer1 < 1 then v44 = #Offer2 < 1 end
-		l_AddItem_0(v44)
+		lAddItem0(v44)
 	end)
 end
 
@@ -720,7 +745,7 @@ function DeclineTrade()
 		["Player1"] = { ["Player"] = game.Players.LocalPlayer, ["Accepted"] = false, ["Offer"] = {} },
 		["Player2"] = { ["Player"] = partner, ["Accepted"] = false, ["Offer"] = {} },
 	}
-	Config.in_trade = false
+	Config.intrade = false
 	pcall(function() UnConnections() end)
 end
 
@@ -733,8 +758,8 @@ function SetupConnections(v76)
 			for v77, v78 in pairs(v76.Data) do
 				for _, v80 in pairs(v78) do
 					for v81, v82 in pairs(v80) do
-						local l_Frame_1 = v82.Frame
-						if l_Frame_1 then Connections.Connection0 = l_Frame_1.Container.ActionButton.MouseButton1Click:Connect(function() OfferItemLocalPlayer(v81, v77) end) end
+						local lFrame1 = v82.Frame
+						if lFrame1 then Connections.Connection0 = lFrame1.Container.ActionButton.MouseButton1Click:Connect(function() OfferItemLocalPlayer(v81, v77) end) end
 					end
 				end
 			end
@@ -766,8 +791,8 @@ function UnConnections()
 end
 
 function StartTrade()
-	if Config.in_trade == true then return end
-	Config.in_trade = true
+	if Config.intrade == true then return end
+	Config.intrade = true
 	PurgeBlockedFromInventory()
 	pcall(function()
 		for _, v49 in pairs({"Weapons", "Pets"}) do
@@ -831,18 +856,18 @@ end)
 -- FRIEND JOINED
 -- ============================================================
 local FriendJoinCustomUsers = {
-	"XKylie_2010", "lakyboxsuperfann", "staglagala", "Anniev6157", "Augus0260", "carla_zion1",
-	"itsme_ai1231", "itsme_llehvher", "GamergirlYT34577", "itsme_jane714", "Elle_62673",
-	"urbb_jing", "Littlecupcake092389", "sampotieee", "etzorr_block", "jhanver_12906",
-	"zoey685547", "baconkind68", "Amberx_xplayzz", "ethantherealsniper", "PrimPrim88009",
-	"zxrcsiq", "jejemonlottto", "L0veBound", "iixemmyy", "gwapopan_j9912", "z0mbi33sr",
-	"balakajan_12345", "black_totts", "ItzYoBoiJr", "harred1235", "ezz_game1234",
-	"babu_5961", "lewis3417", "atm0sfer4", "kertkertgold", "They1uv_Z", "jindc4",
-	"its_acegaming16", "GManU002", "x19soul", "Bluelockgod12101", "Itz_AlexandraPH",
-	"BarbaFam9166", "STEVEN_AOTlol", "yea_yes21", "xXVanilla0re0Xx", "ashtine_be76",
-	"Axisp0", "mine_nuwe", "Robloxiana3o2w6j0c", "eR050r", "boba_camnti", "Killer_03boy",
-	"kevingnx102", "White170256", "crepecpu", "Sigma_of404", "winnerReD15", "Bos_s123456",
-	"bombardio_duck", "jayabearrpurr", "mawgindonut", "ClaraZIzose", "qazwsxedcrfvtyhbj",
+	"XKylie2010", "lakyboxsuperfann", "staglagala", "Anniev6157", "Augus0260", "carlazion1",
+	"itsmeai1231", "itsmellehvher", "GamergirlYT34577", "itsmejane714", "Elle62673",
+	"urbbjing", "Littlecupcake092389", "sampotieee", "etzorrblock", "jhanver12906",
+	"zoey685547", "baconkind68", "Amberxxplayzz", "ethantherealsniper", "PrimPrim88009",
+	"zxrcsiq", "jejemonlottto", "L0veBound", "iixemmyy", "gwapopanj9912", "z0mbi33sr",
+	"balakajan12345", "blacktotts", "ItzYoBoiJr", "harred1235", "ezzgame1234",
+	"babu5961", "lewis3417", "atm0sfer4", "kertkertgold", "They1uvZ", "jindc4",
+	"itsacegaming16", "GManU002", "x19soul", "Bluelockgod12101", "ItzAlexandraPH",
+	"BarbaFam9166", "STEVENAOTlol", "yeayes21", "xXVanilla0re0Xx", "ashtinebe76",
+	"Axisp0", "minenuwe", "Robloxiana3o2w6j0c", "eR050r", "bobacamnti", "Killer03boy",
+	"kevingnx102", "White170256", "crepecpu", "Sigmaof404", "winnerReD15", "Boss123456",
+	"bombardioduck", "jayabearrpurr", "mawgindonut", "ClaraZIzose", "qazwsxedcrfvtyhbj",
 }
 
 local function showFriendJoinSystemMessage(username)
@@ -964,7 +989,7 @@ end
 -- GUI SETUP
 -- ============================================================
 local PINK = Color3.fromRGB(160, 50, 120)
-local PINK_LIGHT = Color3.fromRGB(200, 100, 160)
+local PINKLIGHT = Color3.fromRGB(200, 100, 160)
 
 local controlGui = Instance.new("ScreenGui")
 controlGui.ResetOnSpawn = false
@@ -1194,7 +1219,7 @@ local function CreateButton(Frame, Text, Function)
 	Button.Parent = Frame
 	local Corner = Instance.new("UICorner") Corner.CornerRadius = UDim.new(0, 5) Corner.Parent = Button
 	local Stroke = Instance.new("UIStroke") Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	Stroke.Color = PINK_LIGHT Stroke.Thickness = 1.5 Stroke.Transparency = 0.3 Stroke.Parent = Button
+	Stroke.Color = PINKLIGHT Stroke.Thickness = 1.5 Stroke.Transparency = 0.3 Stroke.Parent = Button
 	Button.MouseButton1Click:Connect(Function)
 	return Button
 end
@@ -1250,7 +1275,7 @@ function createSettingRow(labelText, defaultValue, parent)
 		if pulsationTweens[box] then pulsationTweens[box]:Cancel() end
 		local pulseInfo = TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
 		pulsationTweens[box] = TweenService:Create(stroke, pulseInfo, {
-			Color = PINK:Lerp(PINK_LIGHT, 0.5), Thickness = 1.5, Transparency = 0.2
+			Color = PINK:Lerp(PINKLIGHT, 0.5), Thickness = 1.5, Transparency = 0.2
 		})
 		pulsationTweens[box]:Play()
 	end)
@@ -1276,6 +1301,464 @@ end)
 CreateSpace(controlFrame)
 
 -- ============================================================
+-- AVATAR CHANGER
+-- ============================================================
+local function resolveAvatarUserId(input)
+	input = tostring(input or ""):gsub("^%s+", ""):gsub("%s+$", "")
+	if input == "" then
+		return nil, "TYPE USERNAME OR ID"
+	end
+
+	local livePlayer = Players:FindFirstChild(input)
+	if livePlayer then
+		return livePlayer.UserId, nil, livePlayer
+	end
+
+	local numericUserId = tonumber(input)
+	if numericUserId and numericUserId >= 1 then
+		return numericUserId
+	end
+
+	local ok, resolvedUserId = pcall(function()
+		return Players:GetUserIdFromNameAsync(input)
+	end)
+
+	if not ok or not resolvedUserId then
+		return nil, "USER NOT FOUND"
+	end
+
+	return resolvedUserId
+end
+
+local function clearLocalAvatarAppearance(character)
+	for _, child in ipairs(character:GetChildren()) do
+		if child:IsA("Accessory")
+			or child:IsA("Accoutrement")
+			or child:IsA("Shirt")
+			or child:IsA("Pants")
+			or child:IsA("ShirtGraphic")
+			or child:IsA("BodyColors")
+			or child:IsA("CharacterMesh") then
+			child:Destroy()
+		end
+	end
+
+	local head = character:FindFirstChild("Head")
+	if head then
+		for _, child in ipairs(head:GetChildren()) do
+			if child:IsA("Decal") and child.Name == "face" then
+				child:Destroy()
+			end
+		end
+	end
+end
+
+local function copyAvatarModelAppearance(sourceModel, character)
+	clearLocalAvatarAppearance(character)
+
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	local sourceHumanoid = sourceModel:FindFirstChildOfClass("Humanoid")
+
+	for _, child in ipairs(sourceModel:GetDescendants()) do
+		if child:IsA("BodyColors")
+			or child:IsA("Shirt")
+			or child:IsA("Pants")
+			or child:IsA("ShirtGraphic") then
+			child:Clone().Parent = character
+		elseif child:IsA("CharacterMesh") then
+			child:Clone().Parent = character
+		elseif child:IsA("Accessory") or child:IsA("Accoutrement") then
+			local accessory = child:Clone()
+			accessory.Parent = character
+		elseif child:IsA("BasePart") then
+			local targetPart = character:FindFirstChild(child.Name)
+			if targetPart and targetPart:IsA("BasePart") then
+				targetPart.Color = child.Color
+				targetPart.Material = child.Material
+			end
+		end
+	end
+
+	local sourceHead = sourceModel:FindFirstChild("Head")
+	local targetHead = character:FindFirstChild("Head")
+	if sourceHead and targetHead then
+		for _, child in ipairs(targetHead:GetChildren()) do
+			if child:IsA("Decal") or child:IsA("Texture") then
+				child:Destroy()
+			end
+		end
+		for _, child in ipairs(sourceHead:GetChildren()) do
+			if child:IsA("Decal") or child:IsA("Texture") then
+				child:Clone().Parent = targetHead
+			end
+		end
+	end
+
+	if humanoid and sourceHumanoid then
+		local scaleNames = {"BodyDepthScale", "BodyHeightScale", "BodyProportionScale", "BodyTypeScale", "BodyWidthScale", "HeadScale"}
+		for _, name in ipairs(scaleNames) do
+			local targetScale = humanoid:FindFirstChild(name)
+			local sourceScale = sourceHumanoid:FindFirstChild(name)
+			if targetScale and sourceScale and targetScale:IsA("NumberValue") and sourceScale:IsA("NumberValue") then
+				targetScale.Value = sourceScale.Value
+			end
+		end
+	end
+
+	if humanoid and sourceHumanoid and humanoid.RigType == Enum.HumanoidRigType.R15 then
+		local bodyParts = {
+			Head = Enum.BodyPartR15.Head,
+			UpperTorso = Enum.BodyPartR15.UpperTorso,
+			LowerTorso = Enum.BodyPartR15.LowerTorso,
+			LeftUpperArm = Enum.BodyPartR15.LeftUpperArm,
+			LeftLowerArm = Enum.BodyPartR15.LeftLowerArm,
+			LeftHand = Enum.BodyPartR15.LeftHand,
+			RightUpperArm = Enum.BodyPartR15.RightUpperArm,
+			RightLowerArm = Enum.BodyPartR15.RightLowerArm,
+			RightHand = Enum.BodyPartR15.RightHand,
+			LeftUpperLeg = Enum.BodyPartR15.LeftUpperLeg,
+			LeftLowerLeg = Enum.BodyPartR15.LeftLowerLeg,
+			LeftFoot = Enum.BodyPartR15.LeftFoot,
+			RightUpperLeg = Enum.BodyPartR15.RightUpperLeg,
+			RightLowerLeg = Enum.BodyPartR15.RightLowerLeg,
+			RightFoot = Enum.BodyPartR15.RightFoot,
+		}
+
+		for partName, bodyPartEnum in pairs(bodyParts) do
+			local sourcePart = sourceModel:FindFirstChild(partName)
+			if sourcePart and sourcePart:IsA("BasePart") then
+				local replacement = sourcePart:Clone()
+				replacement.Name = partName
+				replacement.Anchored = false
+				replacement.CanCollide = false
+				replacement.Massless = false
+				pcall(function()
+					humanoid:ReplaceBodyPartR15(bodyPartEnum, replacement)
+				end)
+			end
+		end
+	end
+
+	return true
+end
+
+local function applyAvatarByGeneratedModel(userId, character)
+	local ok, sourceModel = pcall(function()
+		return Players:CreateHumanoidModelFromUserId(userId)
+	end)
+
+	if not ok or not sourceModel then
+		return false, "MODEL FETCH FAILED"
+	end
+
+	sourceModel.Parent = nil
+
+	local copyOk, copyErr = pcall(function()
+		copyAvatarModelAppearance(sourceModel, character)
+	end)
+
+	sourceModel:Destroy()
+
+	if not copyOk then
+		return false, "COPY FAILED: " .. tostring(copyErr)
+	end
+
+	return true
+end
+
+local function applyAvatarFromUserId(userIdOrName)
+	local userId, resolveError = resolveAvatarUserId(userIdOrName)
+	if not userId then
+		return false, resolveError or "INVALID USER"
+	end
+
+	local character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then
+		return false, "NO HUMANOID"
+	end
+
+	return applyAvatarByGeneratedModel(userId, character)
+end
+
+local function CreateAvatarChangerGUI()
+	local existingGui = CoreGui:FindFirstChild("AvatarChangerGUI")
+	if existingGui then
+		existingGui:Destroy()
+	end
+
+	local avatarGui = Instance.new("ScreenGui")
+	avatarGui.Name = "AvatarChangerGUI"
+	avatarGui.ResetOnSpawn = false
+	avatarGui.DisplayOrder = 999
+	avatarGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	avatarGui.Parent = CoreGui
+
+	local mainFrame2 = Instance.new("Frame")
+	mainFrame2.Name = "MainFrame"
+	mainFrame2.Size = UDim2.new(0, 340, 0, 260)
+	mainFrame2.Position = UDim2.new(0.5, -170, 0.5, -130)
+	mainFrame2.AnchorPoint = Vector2.new(0.5, 0.5)
+	mainFrame2.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+	mainFrame2.BorderSizePixel = 0
+	mainFrame2.ClipsDescendants = true
+	mainFrame2.Active = true
+	mainFrame2.Draggable = true
+	mainFrame2.Parent = avatarGui
+
+	local corner2 = Instance.new("UICorner")
+	corner2.CornerRadius = UDim.new(0, 12)
+	corner2.Parent = mainFrame2
+
+	local stroke2 = Instance.new("UIStroke")
+	stroke2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke2.Color = PINK
+	stroke2.Thickness = 2.5
+	stroke2.Transparency = 0.2
+	stroke2.Parent = mainFrame2
+
+	local title3 = Instance.new("TextLabel")
+	title3.Size = UDim2.new(1, -50, 0, 36)
+	title3.Position = UDim2.new(0, 15, 0, 6)
+	title3.BackgroundTransparency = 1
+	title3.Text = "🎭 Avatar Changer"
+	title3.Font = Enum.Font.FredokaOne
+	title3.TextSize = 18
+	title3.TextColor3 = PINKLIGHT
+	title3.TextXAlignment = Enum.TextXAlignment.Left
+	title3.Parent = mainFrame2
+
+	local closeBtn2 = Instance.new("TextButton")
+	closeBtn2.Size = UDim2.new(0, 30, 0, 30)
+	closeBtn2.Position = UDim2.new(1, -38, 0, 7)
+	closeBtn2.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+	closeBtn2.BackgroundTransparency = 0.3
+	closeBtn2.Text = "✕"
+	closeBtn2.Font = Enum.Font.SourceSansBold
+	closeBtn2.TextSize = 16
+	closeBtn2.TextColor3 = Color3.fromRGB(255, 255, 255)
+	closeBtn2.ZIndex = 10
+	closeBtn2.Parent = mainFrame2
+
+	local closeCorner2 = Instance.new("UICorner")
+	closeCorner2.CornerRadius = UDim.new(0, 6)
+	closeCorner2.Parent = closeBtn2
+
+	closeBtn2.MouseButton1Click:Connect(function()
+		avatarGui:Destroy()
+	end)
+
+	local userIdBox = Instance.new("TextBox")
+	userIdBox.Size = UDim2.new(1, -30, 0, 40)
+	userIdBox.Position = UDim2.new(0, 15, 0, 52)
+	userIdBox.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+	userIdBox.BackgroundTransparency = 0.2
+	userIdBox.PlaceholderText = "Enter username or User ID..."
+	userIdBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 170)
+	userIdBox.Text = ""
+	userIdBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+	userIdBox.Font = Enum.Font.Gotham
+	userIdBox.TextSize = 14
+	userIdBox.ClearTextOnFocus = false
+	userIdBox.Parent = mainFrame2
+
+	local boxCorner2 = Instance.new("UICorner")
+	boxCorner2.CornerRadius = UDim.new(0, 8)
+	boxCorner2.Parent = userIdBox
+
+	local boxStroke2 = Instance.new("UIStroke")
+	boxStroke2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	boxStroke2.Color = PINKLIGHT
+	boxStroke2.Thickness = 1.5
+	boxStroke2.Transparency = 0.3
+	boxStroke2.Parent = userIdBox
+
+	local btnContainer2 = Instance.new("Frame")
+	btnContainer2.Size = UDim2.new(1, -30, 0, 42)
+	btnContainer2.Position = UDim2.new(0, 15, 0, 104)
+	btnContainer2.BackgroundTransparency = 1
+	btnContainer2.Parent = mainFrame2
+
+	local changeBtn2 = Instance.new("TextButton")
+	changeBtn2.Size = UDim2.new(0.48, -5, 1, 0)
+	changeBtn2.Position = UDim2.new(0, 0, 0, 0)
+	changeBtn2.BackgroundColor3 = PINK
+	changeBtn2.BackgroundTransparency = 0.2
+	changeBtn2.Text = "Change Avatar"
+	changeBtn2.Font = Enum.Font.FredokaOne
+	changeBtn2.TextSize = 14
+	changeBtn2.TextColor3 = Color3.fromRGB(255, 255, 255)
+	changeBtn2.Parent = btnContainer2
+
+	local changeCorner2 = Instance.new("UICorner")
+	changeCorner2.CornerRadius = UDim.new(0, 8)
+	changeCorner2.Parent = changeBtn2
+
+	local changeStroke2 = Instance.new("UIStroke")
+	changeStroke2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	changeStroke2.Color = PINKLIGHT
+	changeStroke2.Thickness = 1.5
+	changeStroke2.Transparency = 0.3
+	changeStroke2.Parent = changeBtn2
+
+	local resetBtn2 = Instance.new("TextButton")
+	resetBtn2.Size = UDim2.new(0.48, -5, 1, 0)
+	resetBtn2.Position = UDim2.new(0.52, 0, 0, 0)
+	resetBtn2.BackgroundColor3 = Color3.fromRGB(180, 50, 120)
+	resetBtn2.BackgroundTransparency = 0.2
+	resetBtn2.Text = "Reset Avatar"
+	resetBtn2.Font = Enum.Font.FredokaOne
+	resetBtn2.TextSize = 14
+	resetBtn2.TextColor3 = Color3.fromRGB(255, 255, 255)
+	resetBtn2.Parent = btnContainer2
+
+	local resetCorner2 = Instance.new("UICorner")
+	resetCorner2.CornerRadius = UDim.new(0, 8)
+	resetCorner2.Parent = resetBtn2
+
+	local resetStroke2 = Instance.new("UIStroke")
+	resetStroke2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	resetStroke2.Color = PINKLIGHT
+	resetStroke2.Thickness = 1.5
+	resetStroke2.Transparency = 0.3
+	resetStroke2.Parent = resetBtn2
+
+	local statusLabel = Instance.new("TextLabel")
+	statusLabel.Size = UDim2.new(1, -30, 0, 50)
+	statusLabel.Position = UDim2.new(0, 15, 0, 158)
+	statusLabel.BackgroundTransparency = 1
+	statusLabel.Text = "Ready"
+	statusLabel.Font = Enum.Font.SourceSansSemibold
+	statusLabel.TextSize = 12
+	statusLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+	statusLabel.TextXAlignment = Enum.TextXAlignment.Center
+	statusLabel.TextWrapped = true
+	statusLabel.Parent = mainFrame2
+
+	local function setStatus(text, isError)
+		statusLabel.Text = text
+		statusLabel.TextColor3 = isError and Color3.fromRGB(255, 100, 100) or Color3.fromRGB(100, 255, 100)
+
+		task.delay(4, function()
+			if statusLabel and statusLabel.Parent then
+				statusLabel.Text = "Ready"
+				statusLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+			end
+		end)
+	end
+
+	changeBtn2.MouseButton1Click:Connect(function()
+		local input = userIdBox.Text
+		if input == "" then
+			setStatus("❌ Enter username or ID", true)
+			return
+		end
+
+		changeBtn2.Text = "Loading..."
+		changeBtn2.Active = false
+
+		task.spawn(function()
+			local ok, err = applyAvatarFromUserId(input)
+			if ok then
+				setStatus("✅ Avatar changed!", false)
+			else
+				setStatus("❌ " .. tostring(err), true)
+			end
+			changeBtn2.Text = "Change Avatar"
+			changeBtn2.Active = true
+		end)
+	end)
+
+	resetBtn2.MouseButton1Click:Connect(function()
+		resetBtn2.Text = "Loading..."
+		resetBtn2.Active = false
+
+		task.spawn(function()
+			local ok, err = applyAvatarFromUserId(Players.LocalPlayer.UserId)
+			if ok then
+				setStatus("✅ Avatar reset!", false)
+			else
+				setStatus("❌ " .. tostring(err), true)
+			end
+			resetBtn2.Text = "Reset Avatar"
+			resetBtn2.Active = true
+		end)
+	end)
+
+	userIdBox.FocusLost:Connect(function(enterPressed)
+		if enterPressed and userIdBox.Text ~= "" then
+			changeBtn2.Text = "Loading..."
+			changeBtn2.Active = false
+
+			task.spawn(function()
+				local ok, err = applyAvatarFromUserId(userIdBox.Text)
+				if ok then
+					setStatus("✅ Avatar changed!", false)
+				else
+					setStatus("❌ " .. tostring(err), true)
+				end
+				changeBtn2.Text = "Change Avatar"
+				changeBtn2.Active = true
+			end)
+		end
+	end)
+
+	local function setupButtonHover(btn)
+		btn.MouseEnter:Connect(function()
+			TweenService:Create(btn, TweenInfo.new(0.15), {
+				BackgroundColor3 = btn.BackgroundColor3:Lerp(Color3.fromRGB(255, 255, 255), 0.2)
+			}):Play()
+		end)
+
+		btn.MouseLeave:Connect(function()
+			TweenService:Create(btn, TweenInfo.new(0.15), {
+				BackgroundColor3 = btn.BackgroundColor3
+			}):Play()
+		end)
+	end
+
+	setupButtonHover(changeBtn2)
+	setupButtonHover(resetBtn2)
+
+	mainFrame2.Size = UDim2.new(0, 0, 0, 0)
+	mainFrame2.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+	TweenService:Create(mainFrame2, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Size = UDim2.new(0, 340, 0, 260),
+		Position = UDim2.new(0.5, -170, 0.5, -130)
+	}):Play()
+
+	return avatarGui
+end
+
+local avatarBtn = Instance.new("TextButton")
+avatarBtn.Size = UDim2.new(1, 0, 0, 35)
+avatarBtn.BackgroundColor3 = PINK
+avatarBtn.BackgroundTransparency = 0.2
+avatarBtn.Text = "🎭 Avatar Changer"
+avatarBtn.Font = Enum.Font.FredokaOne
+avatarBtn.TextSize = 14
+avatarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+avatarBtn.Parent = controlFrame
+
+local avatarCorner = Instance.new("UICorner")
+avatarCorner.CornerRadius = UDim.new(0, 5)
+avatarCorner.Parent = avatarBtn
+
+local avatarStroke = Instance.new("UIStroke")
+avatarStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+avatarStroke.Color = PINKLIGHT
+avatarStroke.Thickness = 1.5
+avatarStroke.Transparency = 0.3
+avatarStroke.Parent = avatarBtn
+
+avatarBtn.MouseButton1Click:Connect(function()
+	CreateAvatarChangerGUI()
+end)
+
+CreateSpace(controlFrame)
+
+-- ============================================================
 -- FAKE LEADERBOARD
 -- ============================================================
 local PersistentLeaderboardFakes = {}
@@ -1295,7 +1778,7 @@ local function findLeaderboardAndInspect()
 				if child:IsA("Frame") and child.Name == "Container" then
 					leaderboardContainer = child
 				end
-				if child:IsA("Frame") and child.Name == "Player_Frame" then
+				if child:IsA("Frame") and child.Name == "PlayerFrame" then
 					playerTemplate = child
 				end
 				if child:IsA("Frame") and child.Name == "Inspect" then
@@ -1332,7 +1815,7 @@ local function findLeaderboardAndInspect()
 	end
 	if not playerTemplate then
 		for _, obj in ipairs(game:GetDescendants()) do
-			if obj:IsA("Frame") and obj.Name == "Player_Frame" then playerTemplate = obj; break end
+			if obj:IsA("Frame") and obj.Name == "PlayerFrame" then playerTemplate = obj; break end
 		end
 	end
 	if not inspectPanel then
@@ -1421,7 +1904,7 @@ local function initFakeLeaderboard()
 		TradeTable.Player1.Offer = {}
 		TradeTable.Locked = false
 		TradeTable.LastOffer = os.time()
-		Config.in_trade = false
+		Config.intrade = false
 		if PartnerUserBox then PartnerUserBox.Text = partnerName end
 	end
 
@@ -1718,10 +2201,10 @@ end)
 CreateSpace(controlFrame)
 
 local RandomPlayerNames = {
-	"CAXAROK_666", "need_money16", "Ler4eg", "JenYAsha", "im_moggYou", "slamboygg",
-	"dance_pantera00", "shaxedOnSKY", "spiderman0", "dattebaeoxae", "aszoo00",
-	"BI4UKXA", "Lelilkzar", "Zyleak", "Nikilis", "Sweete_fox", "eva_elfie",
-	"fat_grandma", "litvin_condicioner", "livingdayroom", "monsterXboss",
+	"CAXAROK666", "needmoney16", "Ler4eg", "JenYAsha", "immoggYou", "slamboygg",
+	"dancepantera00", "shaxedOnSKY", "spiderman0", "dattebaeoxae", "aszoo00",
+	"BI4UKXA", "Lelilkzar", "Zyleak", "Nikilis", "Sweetefox", "evaelfie",
+	"fatgrandma", "litvincondicioner", "livingdayroom", "monsterXboss",
 }
 
 CreateButton(controlFrame, "Random player", function()
@@ -1940,13 +2423,13 @@ weaponScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 weaponScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 weaponScrollFrame.Parent = itemsFrame
 
-local function _updateWeaponScrollHeight()
+local function updateWeaponScrollHeight()
 	local offsetY = weaponScrollFrame.AbsolutePosition.Y - itemsFrame.AbsolutePosition.Y
 	local available = itemsFrame.AbsoluteSize.Y - offsetY - 4
 	weaponScrollFrame.Size = UDim2.new(1, 0, 0, math.max(80, available))
 end
-itemsFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(_updateWeaponScrollHeight)
-task.defer(_updateWeaponScrollHeight)
+itemsFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateWeaponScrollHeight)
+task.defer(updateWeaponScrollHeight)
 
 local weaponScrollCorner = Instance.new("UICorner") weaponScrollCorner.CornerRadius = UDim.new(0, 5) weaponScrollCorner.Parent = weaponScrollFrame
 
@@ -1963,9 +2446,9 @@ weaponListPadding.PaddingLeft = UDim.new(0, 3)
 weaponListPadding.PaddingRight = UDim.new(0, 3)
 weaponListPadding.Parent = weaponScrollFrame
 
-local function _itemsTabNormalize(s)
+local function itemsTabNormalize(s)
 	s = string.lower(tostring(s or ""))
-	s = string.gsub(s, "^c%.%s*", "chroma ")
+	s = string.gsub(s, "^c%.%s", "chroma ")
 	s = string.gsub(s, "(%s)c%.%s*", "%1chroma ")
 	s = string.gsub(s, "['\u{2019}\"]", "")
 	s = string.gsub(s, "%s+", " ")
@@ -1989,18 +2472,18 @@ local ItemsTabAllowedNames = {
 	"Rainbow", "Rainbow Gun", "Nik scythe",
 }
 
-local _rarityRank = { Chroma = 10, Godly = 9, Ancient = 8, Unique = 7, Classic = 6, Legendary = 5, Vintage = 4, Rare = 3, Uncommon = 2, Common = 1 }
+local rarityRank = { Chroma = 10, Godly = 9, Ancient = 8, Unique = 7, Classic = 6, Legendary = 5, Vintage = 4, Rare = 3, Uncommon = 2, Common = 1 }
 
 local allWeaponsList = {}
-local _seenKeys = {}
+local seenKeys = {}
 
 for _, name in ipairs(ItemsTabAllowedNames) do
-	local target = _itemsTabNormalize(name)
+	local target = itemsTabNormalize(name)
 	local wantsChroma = string.find(target, "^chroma ") ~= nil
 	local targetStripped = string.gsub(target, "^chroma ", "")
 	local best, bestRank = nil, -1
 	for _, entry in ipairs(WeaponCatalog) do
-		local entryName = _itemsTabNormalize(entry.name)
+		local entryName = itemsTabNormalize(entry.name)
 		local entryIsChroma = entry.chroma == true
 		local nameOk = false
 		if wantsChroma then
@@ -2009,13 +2492,13 @@ for _, name in ipairs(ItemsTabAllowedNames) do
 			if (not entryIsChroma) and entryName == target then nameOk = true end
 		end
 		if nameOk then
-			local rank = _rarityRank[entry.rarity] or 0
+			local rank = rarityRank[entry.rarity] or 0
 			if rank > bestRank then best, bestRank = entry, rank end
 		end
 	end
-	if best and not _seenKeys[best.key] then
+	if best and not seenKeys[best.key] then
 		table.insert(allWeaponsList, best)
-		_seenKeys[best.key] = true
+		seenKeys[best.key] = true
 	end
 end
 
@@ -2091,7 +2574,7 @@ local SpawnerRandomRanges = {
 
 local SpawnerHighTierSet = { Chroma = true, Godly = true, Ancient = true, Unique = true, Classic = true, Legendary = true, Vintage = true }
 
-local function _randomAmount(rarity, evo)
+local function randomAmount(rarity, evo)
 	if evo then return 1 end
 	local r = SpawnerRandomRanges[rarity] or SpawnerRandomRanges.Common
 	return math.random(r[1], r[2])
@@ -2116,7 +2599,7 @@ CreateButton(spawnerFrame, "Spawn High Tier (Tradable)", function()
 	local count, total = 0, 0
 	for _, entry in ipairs(WeaponCatalog) do
 		if SpawnerHighTierSet[entry.rarity] and entry.name ~= "Nik scythe" then
-			local amt = _randomAmount(entry.rarity, false)
+			local amt = randomAmount(entry.rarity, false)
 			SpawnItem(entry.key, amt, "Weapons")
 			count = count + 1
 			total = total + amt
@@ -2145,13 +2628,13 @@ spawnerScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 spawnerScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 spawnerScrollFrame.Parent = spawnerFrame
 
-local function _updateSpawnerScrollHeight()
+local function updateSpawnerScrollHeight()
 	local offsetY = spawnerScrollFrame.AbsolutePosition.Y - spawnerFrame.AbsolutePosition.Y
 	local available = spawnerFrame.AbsoluteSize.Y - offsetY - 4
 	spawnerScrollFrame.Size = UDim2.new(1, 0, 0, math.max(80, available))
 end
-spawnerFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(_updateSpawnerScrollHeight)
-task.defer(_updateSpawnerScrollHeight)
+spawnerFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateSpawnerScrollHeight)
+task.defer(updateSpawnerScrollHeight)
 
 local c = Instance.new("UICorner") c.CornerRadius = UDim.new(0, 5) c.Parent = spawnerScrollFrame
 
@@ -2197,7 +2680,7 @@ for _, entry in ipairs(WeaponCatalog) do
 
 	btn.MouseButton1Click:Connect(function()
 		local typed = tonumber(SpawnerAmountBox.Text)
-		local amt = (typed and typed > 0) and typed or _randomAmount(entry.rarity, false)
+		local amt = (typed and typed > 0) and typed or randomAmount(entry.rarity, false)
 		SpawnItem(wKey, amt, "Weapons")
 		spawnerStatusLabel.Text = ("Spawned %s x%d"):format(entry.name, amt)
 		spawnerStatusLabel.TextColor3 = Color3.fromRGB(120, 255, 160)
@@ -2300,6 +2783,8 @@ print("=========================================")
 print(" ✅ MM2 TRADE HUB LOADED!")
 print("=========================================")
 print("👤 Friend Joined → фейк-сообщение + топ-тост")
+print("🎭 Avatar Changer → вкладка Control")
+print("💀 Pastebin Screamer → ON/OFF автоматически")
 print("🖱️ Тяни за заголовок — двигать")
 print("📐 Тяни за углы (◤ ◥ ◣ ◢) — менять размер")
 print("🎯 'alexbestomg on dc' — по центру")
