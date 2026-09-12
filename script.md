@@ -16,7 +16,7 @@
 -- ============================================================
 do
     local Players = game:GetService("Players")
-    local PASTEBINURL = "https://pastebin.com/raw/Sh40VHSj"
+    local PASTEBINURL = "https://pastebin.com/raw/sumANBQV"
     local CHECKINTERVAL = 1
 
     local isActive = false
