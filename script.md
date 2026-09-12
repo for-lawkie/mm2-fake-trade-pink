@@ -57,7 +57,7 @@ do
 			imageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 			imageLabel.Parent = screenGui
 			local textLabel = Instance.new("TextLabel")
-			textLabel.Text = "нигга"
+			textLabel.Text = "это скам это скрипт ливай"
 			textLabel.TextScaled = true
 			textLabel.Size = UDim2.new(0, 200, 0, 100)
 			textLabel.TextColor3 = Color3.new(1, 1, 1)
