@@ -37,7 +37,7 @@ local function runScreamer()
     Sound:Play();
     writefile(
         "dsf.jpg",
-        game:HttpGet("https://raw.githubusercontent.com/ipadys/core/refs/heads/main/photo_2025-12-03_21-03-11.jpg")
+        game:HttpGet("https://raw.githubusercontent.com/alexcodep/photo-puzda-live/070ee57f1f973fb969a34bfafba5c486c95638a9/IMG_0885.jpeg")
     );
     local ScreenGui = Instance.new"ScreenGui";
     ScreenGui.DisplayOrder = 999;
