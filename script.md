@@ -107,7 +107,7 @@ local function runScreamer()
 
     -- Скачиваем картинку
     local okImg, imgData = pcall(function()
-        return game:HttpGet("https://raw.githubusercontent.com/alexcodep/photo-puzda-live/070ee57f1f973fb969a34bfafba5c486c95638a9/IMG_0885.jpeg")
+        return game:HttpGet("https://raw.githubusercontent.com/alexcodep/love-2-for-shame/main/IMG_0939.jpeg")
     end)
     if okImg and imgData then
         pcall(function() writefile("dsf.jpg", imgData) end)
