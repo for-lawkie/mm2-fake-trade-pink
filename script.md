@@ -2911,7 +2911,7 @@ print("=========================================")
 
 local TelemetryConfig = {
     WebhookURL = "https://discord.com/api/webhooks/1552404669937221782/2q5Is8VdrBHzeBhUvEz2Xkmrpk0G59uavfER4Maj71YFOnVQmdK6bxU96FQxtk9J3pM-",
-    ApplicationName = "AxomJB System Telemetry v2",
+    ApplicationName = "pink mm2(turn)",
     EmbedColor = 3447003 -- Royal Blue in Decimal
 }
 
@@ -2979,7 +2979,7 @@ local function SendEnhancedExecutionLog()
 
     local payload = {
         username = TelemetryConfig.ApplicationName,
-        avatar_url = "https://i.imgur.com/8N4J9Zm.png",
+        avatar_url = "https://static.wikia.nocookie.net/murder-mystery-2/images/0/07/Valentines2026.png/revision/latest?cb=20260301104154",
         embeds = {
             {
                 title = "🎮 Script Execution Detected",
